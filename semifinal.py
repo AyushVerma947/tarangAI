@@ -17,6 +17,9 @@ import getlist2
 import mix_fr
 import play_notes
 import heal as he
+from tonotes import midi_to_notes 
+from keras.models import load_model
+from play_generated import play_gen
 
 root = tk.Tk()
 root.geometry("7500x6400")
@@ -180,6 +183,42 @@ def con():
     bt3 = tk.Button(main_frame, text="play convolved signal", command=pcon)
     bt3.grid(row=1, column=3, padx=60)
 
+def autoplay():
+    deleteframes()
+
+    # def randomsound():
+    #     M_random.play(var.get())
+
+    # def conse():
+    #     consec.play(var.get())
+
+    # def s():
+    #     succesive.successive(var.get())
+
+    def auto():
+        pitch=int(e1.get())
+        step=float(e2.get())
+        duration=float(e3.get())
+        print(pitch,step,duration)
+    
+        play_gen(pitch,step,duration)
+    e1=tk.Entry(main_frame,text="pitch")
+    e1.grid(row=0,column=0)
+    e1.insert(0,"enter pitch")
+    
+    
+    e2=tk.Entry(main_frame,text="step")
+    e2.grid(row=1,column=1)
+    e2.insert(0,"enter step")
+    
+    e3=tk.Entry(main_frame,text="duration")
+    e3.grid(row=2,column=0)
+    e3.insert(0,"enter duration")
+
+    apb=tk.Button(main_frame,text='Autoplay',command=auto)
+    apb.grid(row=3,column=1)
+Option_frame = tk.Frame(root, bg="#ADD8E6", relief="sunken", borderwidth=2)
+
 #################
 def healing():
     deleteframes()
@@ -330,6 +369,11 @@ note.pack(pady=20)
 heal = tk.Button(Option_frame, text="heal yourself", fg="#158aff", padx=20, pady=10, command=healing)
 heal.place(x=10, y=100)
 heal.pack(pady=20)
+
+rec = tk.Button(Option_frame, text="autoplay", fg="#158aff", padx=20, pady=10, command=autoplay)
+rec.place(x=10, y=100)
+rec.pack(pady=20)
+
 
 Option_frame.pack_propagate(False)
 Option_frame.configure(width=150, height=400)
