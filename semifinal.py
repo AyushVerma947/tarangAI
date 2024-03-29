@@ -20,6 +20,7 @@ import heal as he
 from tonotes import midi_to_notes 
 from keras.models import load_model
 from play_generated import play_gen
+from audiogen import play_generated_notes
 
 root = tk.Tk()
 root.geometry("7500x6400")
@@ -186,22 +187,17 @@ def con():
 def autoplay():
     deleteframes()
 
-    # def randomsound():
-    #     M_random.play(var.get())
-
-    # def conse():
-    #     consec.play(var.get())
-
-    # def s():
-    #     succesive.successive(var.get())
-
     def auto():
+        global notes
         pitch=int(e1.get())
         step=float(e2.get())
         duration=float(e3.get())
         print(pitch,step,duration)
-    
-        play_gen(pitch,step,duration)
+        notes=play_gen(pitch,step,duration)
+
+    def ap():
+        play_generated_notes(notes)
+
     e1=tk.Entry(main_frame,text="pitch")
     e1.grid(row=0,column=0)
     e1.insert(0,"enter pitch")
@@ -215,8 +211,13 @@ def autoplay():
     e3.grid(row=2,column=0)
     e3.insert(0,"enter duration")
 
-    apb=tk.Button(main_frame,text='Autoplay',command=auto)
+
+    apb=tk.Button(main_frame,text='Generate Notes',command=auto)
     apb.grid(row=3,column=1)
+
+    apb2=tk.Button(main_frame,text='Play Genereted notes',command=ap)
+    apb2.grid(row=4,column=0)
+
 Option_frame = tk.Frame(root, bg="#ADD8E6", relief="sunken", borderwidth=2)
 
 #################
