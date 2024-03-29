@@ -3,7 +3,7 @@ import numpy as np
 import tensorflow as tf
 import pandas as pd
 import pretty_midi
-
+key_order=['pitch','step','duration']
 print('hi')
 def notes_to_midi(
   notes: pd.DataFrame,
@@ -69,7 +69,20 @@ def predict_next_note(
 def play_gen(pitch,step,duration):
     print('')
 
-    model=load_model('C:/Users/DELL/OneDrive/Desktop/Ai-Music-Generator-d4264db1fe9d9966b68d21c37844f051cf8553b4/sem 3/model_test.h5')
+    # model=load_model('C:\Users\DELL\OneDrive\Desktop\tarangAI\model_terminal.h5'
+
+# Define the custom loss function
+    def mse_with_positive_pressure(y_true: tf.Tensor, y_pred: tf.Tensor):
+      mse = (y_true - y_pred) ** 2
+      positive_pressure = 10 * tf.maximum(-y_pred, 0.0)
+      return tf.reduce_mean(mse + positive_pressure)
+
+    # Register the custom loss function with Keras
+    losses = {'mse_with_positive_pressure': mse_with_positive_pressure}
+
+    # Load the model with custom loss function
+    model = load_model("C:/Users/DELL/OneDrive/Desktop/tarangAI/model_terminal.h5", custom_objects=losses)
+
     temperature = 10.0
     num_predictions = 120
 
@@ -91,7 +104,7 @@ def play_gen(pitch,step,duration):
         input_notes = np.delete(input_notes, 0, axis=0)
         input_notes = np.append(input_notes, np.expand_dims(input_note, 0), axis=0)
         prev_start = end
-
+    
     generated_notes = pd.DataFrame(
         generated_notes, columns=(*key_order, 'start', 'end'))
     
