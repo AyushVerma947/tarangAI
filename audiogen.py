@@ -1,46 +1,51 @@
-import simpleaudio as sa
-import pretty_midi 
 import numpy as np
+from pydub import AudioSegment
+from pydub.playback import play
+import pandas as pd
 
 def pitch_to_freq(pitch):
     return 440 * (2 ** ((pitch - 69) / 12))
 
+def generate_sine_wave(duration, frequency=440, amplitude=0.5, sample_rate=44100):
+    # Generate time array
+    time = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+    # Generate sine wave
+    sine_wave = amplitude * np.sin(2 * np.pi * frequency * time)
+    # Convert to 16-bit integers
+    sine_wave = np.array(32767 * sine_wave, dtype=np.int16)
+    return sine_wave
+
 def play_generated_notes(generated_notes):
-    # Create a PrettyMIDI object
-    midi_data = pretty_midi.PrettyMIDI()
+    # Create an empty audio segment
+    audio = AudioSegment.empty()
 
-    # Create an instrument object
-    instrument = pretty_midi.Instrument(program=0)
-
-    # Add notes to the instrument
-    for index, row in generated_notes.iterrows():
+    # Add notes to the audio segment
+    for _, row in generated_notes.iterrows():
         pitch = int(row['pitch'])
-        start_time = row['start']
-        end_time = row['end']
+        duration = row['duration']
         frequency = pitch_to_freq(pitch)
-        note = pretty_midi.Note(
-            velocity=100,  # Fixed velocity for simplicity
-            pitch=pitch,
-            start=start_time,
-            end=end_time
-        )
-        instrument.notes.append(note)
+        amplitude = 0.5  # Adjust as needed
+        sample_rate = 44100
+        sine_wave = generate_sine_wave(duration, frequency, amplitude, sample_rate)
+        note_audio = AudioSegment(sine_wave.tobytes(), frame_rate=sample_rate, sample_width=2, channels=1)
+        audio = audio.append(note_audio, crossfade=0)
 
-    # Add the instrument to the MIDI data
-    midi_data.instruments.append(instrument)
+    # Normalize the audio data
+    audio = audio.set_frame_rate(sample_rate).set_channels(1)
 
-    # Write the MIDI data to a file (optional)
-    midi_data.write('output.mid')
+    # Play the audio using pydub's play function
+    play(audio)
 
-    # Synthesize the MIDI data and play it
-    audio_data = midi_data.synthesize()
-    # The audio data is in floating point format, so normalize before converting to 16-bit integers
-    audio_data /= np.max(np.abs(audio_data))
-    audio_data = (audio_data * 32767).astype(np.int16)
-
-    # Play the audio
-    play_obj = sa.play_buffer(audio_data, 1, 2, 44100)
-
-    # Wait for playback to finish
-    play_obj.wait_done()
-
+# # Example usage
+# # Assuming generated_notes is a pandas DataFrame with columns 'pitch', 'step', 'duration', 'start', 'end'
+# # Replace this with your actual DataFrame
+# generated_notes = pd.DataFrame({
+#     'pitch': [60, 62, 64, 65],
+#     'step': [0.1, 0.2, 0.3, 0.4],
+#     'duration': [0.5, 0.5, 0.5, 0.5],
+#     'start': [0, 1, 2, 3],
+#     'end': [0.5, 1.5, 2.5, 3.5]
+# })
+# #kuch run hua tha abhi??nahihaan music play hua,ok.
+# # Play the generated notes
+# play_generated_notes(generated_notes)
