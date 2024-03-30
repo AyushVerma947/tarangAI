@@ -2,7 +2,7 @@ from keras.models import load_model
 import numpy as np
 import tensorflow as tf
 import pandas as pd
-import simpleaudio as sa
+import filter
 
 import pretty_midi
 key_order=['pitch','step','duration']
@@ -71,7 +71,7 @@ def predict_next_note(
 def play_gen(pitch,step,duration):
     print('')
 
-    # model=load_model('C:\Users\DELL\OneDrive\Desktop\tarangAI\model_terminal.h5'
+    # model=load_model('C:\Users\DELL\OneDrive\Desktop\tarangAI\local_model.h5'
 
 # Define the custom loss function
     def mse_with_positive_pressure(y_true: tf.Tensor, y_pred: tf.Tensor):
@@ -83,7 +83,7 @@ def play_gen(pitch,step,duration):
     losses = {'mse_with_positive_pressure': mse_with_positive_pressure}
 
     # Load the model with custom loss function
-    model = load_model("C:/Users/DELL/OneDrive/Desktop/tarangAI/model_terminal.h5", custom_objects=losses)
+    model = load_model("C:/Users/DELL/OneDrive/Desktop/tarangAI/local_model.h5", custom_objects=losses)
 
     temperature = 10.0
     num_predictions = 120
@@ -112,5 +112,7 @@ def play_gen(pitch,step,duration):
     
     df = generated_notes
     print(generated_notes)
+    # filter.filternotes(generated_notes)
     return generated_notes
 
+# play_gen(32,0.12,0.36)
