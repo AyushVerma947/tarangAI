@@ -2,7 +2,7 @@ from keras.models import load_model
 import numpy as np
 import tensorflow as tf
 import pandas as pd
-import simpleaudio as sa
+# import simpleaudio as sa
 
 import pretty_midi
 key_order=['pitch','step','duration']
@@ -83,7 +83,7 @@ def play_gen(pitch,step,duration):
     losses = {'mse_with_positive_pressure': mse_with_positive_pressure}
 
     # Load the model with custom loss function
-    model = load_model("C:/Users/DELL/OneDrive/Desktop/tarangAI/model_terminal.h5", custom_objects=losses)
+    model = load_model("C:/Users/vinee/mini_project/tarangAI/model_terminal.h5", custom_objects=losses)
 
     temperature = 10.0
     num_predictions = 120

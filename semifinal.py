@@ -2,6 +2,8 @@ from cProfile import label
 import glob
 from optparse import Option
 import tkinter as tk
+from tkinter import ttk
+from display_note import plot_piano_roll
 import csv_Play
 from tkinter import filedialog, Toplevel
 import la
@@ -186,7 +188,24 @@ def con():
 
 def autoplay():
     deleteframes()
+    def display_generated_notes(generated_notes, parent_frame):
+        tree = ttk.Treeview(parent_frame)
+        tree["columns"] = list(generated_notes.columns)
+        tree["show"] = "headings"
+        for column in generated_notes.columns:
+            tree.heading(column, text=column)
 
+        for index, row in generated_notes.iterrows():
+            tree.insert("", "end", values=list(row))
+
+        tree.grid(row=5, column=2, sticky="nsew")
+
+    def load_graph_image():
+        plot_image = tk.PhotoImage(file='piano_roll.png')
+        label_plot = ttk.Label(main_frame, image=plot_image )
+        label_plot.image = plot_image  # To prevent image from being garbage collected
+        label_plot.grid(row=9, column=2,padx=10,pady=10)
+        
     def auto():
         global notes
         pitch=int(e1.get())
@@ -194,6 +213,9 @@ def autoplay():
         duration=float(e3.get())
         print(pitch,step,duration)
         notes=play_gen(pitch,step,duration)
+        display_generated_notes(notes,main_frame)
+        plot_piano_roll(notes)
+        load_graph_image()
 
     def ap():
         play_generated_notes(notes)
